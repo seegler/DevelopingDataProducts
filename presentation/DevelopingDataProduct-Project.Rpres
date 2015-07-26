@@ -1,0 +1,59 @@
+Developing Data Products - Project
+========================================================
+author: Seegler 
+date: `r date()`
+transition : rotate
+
+
+About the Project
+========================================================
+
+This presentation is being created as part of the peer assessment for the coursera developing data products class. 
+
+As part of this project,
+- GDP Explorer, a Shiny application, has been developed and hosted at ShinyApps[link]. 
+- Source code of the application is available at GitHub[link]
+
+GDP Explorer - Application
+========================================================
+GDP Explorer application helps user to explore the GDP of countries and compare their GDP growth from year 1960 to 2014. User can choose or adjust following interactive fields:
+
+- Select the range of years to explore. Range is available between 1960 to 2014
+- Select one or more countries to explore from a list of available countries
+
+
+GDP Explorer - Data
+========================================================
+GDP data used in this project is downloaded from [World Bank API server](http://api.worldbank.org/v2/en/indicator/ny.gdp.mktp.cd?downloadformat=csv). Downloaded data has been uploaded under this project's GitHub repo[Link]()
+```{r echo=FALSE }
+library(data.table)
+data <- read.csv("../data/ny.gdp.mktp.cd_Indicator_en_csv_v2.csv", skip=4, header=TRUE, check.names = FALSE);
+```
+Variables in this GDP data set:
+```{r}
+names(data)
+```
+
+GDP Explorer - Sample Plot
+========================================================
+GDP Explorer presents the GDP growth in line plots for the selected countries and range of years. For example, GDP for United States and China from 1990 and 2014 would be shown as follows
+
+```{r, echo=FALSE}
+input_countries <- c("United States", "China");
+input_years <- as.character(1990:2014);
+data <- read.csv("../data/ny.gdp.mktp.cd_Indicator_en_csv_v2.csv", skip=4, header=TRUE, check.names = FALSE);
+colnames(data)[1]="Country"
+columns <- c("Country", input_years);
+plot_data <-data[data$Country %in% input_countries,columns]
+require(reshape2)
+require(ggplot2)
+plot_data <- melt(plot_data)
+colnames(plot_data) = c("Country","Year","GDP");
+plot_data[3] = plot_data[3]/100000000
+ggplot(plot_data, aes(x=Year, y=GDP, color=Country)) +
+  geom_line(aes(group=Country))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylab("GDP in billion $") + 
+  ggtitle("GDP Growth")
+
+```
